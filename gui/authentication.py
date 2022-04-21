@@ -1,0 +1,100 @@
+# -*- coding: utf-8 -*-
+
+# Form implementation generated from reading ui file 'authentication.ui'
+#
+# Created by: PyQt5 UI code generator 5.14.1
+#
+# WARNING! All changes made in this file will be lost!
+
+
+from PyQt5 import QtCore, QtGui, QtWidgets
+
+
+class Ui_authentication(object):
+    def setupUi(self, authentication):
+        authentication.setObjectName("authentication")
+        authentication.resize(400, 600)
+        authentication.setMinimumSize(QtCore.QSize(400, 600))
+        authentication.setMaximumSize(QtCore.QSize(400, 600))
+        self.authentication_label = QtWidgets.QLabel(authentication)
+        self.authentication_label.setGeometry(QtCore.QRect(90, 80, 220, 80))
+        font = QtGui.QFont()
+        font.setFamily("黑体")
+        font.setPointSize(32)
+        font.setBold(False)
+        font.setWeight(50)
+        self.authentication_label.setFont(font)
+        self.authentication_label.setCursor(QtGui.QCursor(QtCore.Qt.ArrowCursor))
+        self.authentication_label.setAlignment(QtCore.Qt.AlignCenter)
+        self.authentication_label.setObjectName("authentication_label")
+        self.authentication_reminder_label = QtWidgets.QLabel(authentication)
+        self.authentication_reminder_label.setGeometry(QtCore.QRect(70, 160, 251, 171))
+        font = QtGui.QFont()
+        font.setFamily("黑体")
+        font.setPointSize(24)
+        font.setBold(False)
+        font.setWeight(50)
+        self.authentication_reminder_label.setFont(font)
+        self.authentication_reminder_label.setCursor(QtGui.QCursor(QtCore.Qt.ArrowCursor))
+        self.authentication_reminder_label.setAlignment(QtCore.Qt.AlignCenter)
+        self.authentication_reminder_label.setWordWrap(True)
+        self.authentication_reminder_label.setObjectName("authentication_reminder_label")
+        self.start_pushbutton = QtWidgets.QPushButton(authentication)
+        self.start_pushbutton.setGeometry(QtCore.QRect(160, 460, 60, 60))
+        self.start_pushbutton.setObjectName("start_pushbutton")
+        self.back_pushbutton = QtWidgets.QPushButton(authentication)
+        self.back_pushbutton.setGeometry(QtCore.QRect(20, 20, 60, 30))
+        font = QtGui.QFont()
+        font.setFamily("黑体")
+        self.back_pushbutton.setFont(font)
+        self.back_pushbutton.setObjectName("back_pushbutton")
+        self.layoutWidget = QtWidgets.QWidget(authentication)
+        self.layoutWidget.setGeometry(QtCore.QRect(40, 340, 321, 62))
+        self.layoutWidget.setObjectName("layoutWidget")
+        self.horizontalLayout = QtWidgets.QHBoxLayout(self.layoutWidget)
+        self.horizontalLayout.setContentsMargins(0, 0, 0, 0)
+        self.horizontalLayout.setObjectName("horizontalLayout")
+        self.num1_label = QtWidgets.QLabel(self.layoutWidget)
+        font = QtGui.QFont()
+        font.setFamily("黑体")
+        font.setPointSize(36)
+        self.num1_label.setFont(font)
+        self.num1_label.setObjectName("num1_label")
+        self.horizontalLayout.addWidget(self.num1_label)
+        self.num2_label = QtWidgets.QLabel(self.layoutWidget)
+        font = QtGui.QFont()
+        font.setFamily("黑体")
+        font.setPointSize(36)
+        self.num2_label.setFont(font)
+        self.num2_label.setObjectName("num2_label")
+        self.horizontalLayout.addWidget(self.num2_label)
+        self.num3_label = QtWidgets.QLabel(self.layoutWidget)
+        font = QtGui.QFont()
+        font.setFamily("黑体")
+        font.setPointSize(36)
+        self.num3_label.setFont(font)
+        self.num3_label.setObjectName("num3_label")
+        self.horizontalLayout.addWidget(self.num3_label)
+        self.num4_label = QtWidgets.QLabel(self.layoutWidget)
+        font = QtGui.QFont()
+        font.setFamily("黑体")
+        font.setPointSize(36)
+        self.num4_label.setFont(font)
+        self.num4_label.setObjectName("num4_label")
+        self.horizontalLayout.addWidget(self.num4_label)
+
+        self.retranslateUi(authentication)
+        QtCore.QMetaObject.connectSlotsByName(authentication)
+
+    def retranslateUi(self, authentication):
+        _translate = QtCore.QCoreApplication.translate
+        authentication.setWindowTitle(_translate("authentication", "Voiceprint Recognition"))
+        self.authentication_label.setText(_translate("authentication", "用户验证"))
+        self.authentication_reminder_label.setText(_translate("authentication", "请对准摄像头\n"
+"说出以下数字"))
+        self.start_pushbutton.setText(_translate("authentication", "开始"))
+        self.back_pushbutton.setText(_translate("authentication", "返回"))
+        self.num1_label.setText(_translate("authentication", "2"))
+        self.num2_label.setText(_translate("authentication", "2"))
+        self.num3_label.setText(_translate("authentication", "2"))
+        self.num4_label.setText(_translate("authentication", "2"))

@@ -1,0 +1,8 @@
+# pycache
+**/__pycache__/
+
+# enroll users' data
+enroll/**
+
+# .idea
+.idea/**
