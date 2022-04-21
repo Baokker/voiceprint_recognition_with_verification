@@ -94,4 +94,9 @@ class Authenticate(authentication.Ui_authentication, QDialog):
 
     def compare(self):
         # the core code
-        self.success.show()
+        ans = True
+
+        if ans == True:
+            self.success.show()
+        else:
+            self.fail.show()
