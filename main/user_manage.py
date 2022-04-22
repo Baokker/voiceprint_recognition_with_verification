@@ -136,3 +136,7 @@ class Delete(user_delete.Ui_user_register, QDialog):
         if ret == QMessageBox.Yes:
             shutil.rmtree(os.path.join(os.curdir, "enroll", self.qList[qModelIndex.row()]))
             self.update_user()
+
+    def show(self):
+        self.update_user()
+        super().show()
