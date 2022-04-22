@@ -92,11 +92,10 @@ class Authenticate(authentication.Ui_authentication, QDialog):
         self.success = Success()
         self.fail = Fail()
 
+    # the core code lies here
     def compare(self):
-        # the core code
         ans = True
-
-        if ans == True:
+        if ans:
             self.success.show()
         else:
             self.fail.show()
