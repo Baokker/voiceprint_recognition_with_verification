@@ -118,6 +118,9 @@ class Delete(user_delete.Ui_user_register, QDialog):
         users_path = os.path.join(os.curdir, "enroll")
 
         users = []
+        if not os.path.exists(os.path.join(os.curdir, "enroll")):
+            os.makedirs(os.path.join(os.curdir, "enroll"))
+
         for file in os.listdir(users_path):
             d = os.path.join(users_path, file)
             if os.path.isdir(d):
