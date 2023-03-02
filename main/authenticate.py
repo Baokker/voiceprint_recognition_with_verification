@@ -1,7 +1,12 @@
+import os
+
+import cv2
+from PyQt5.QtCore import QObject, pyqtSignal, QThreadPool, QRunnable, QThread
 from PyQt5.QtWidgets import QDialog
 
 from gui import success, fail, authentication
-
+from lip_detect import detect_mouth_movement
+from record_audio import record_with_pyaudio
 
 class Success(success.Ui_success, QDialog):
     def __init__(self):
@@ -31,47 +36,19 @@ def generate_4_digit_code():
     return random_num
 
 
-# filename could be absolute path
-def record_with_pyaudio(filename, record_seconds=10, fs=16000):
-    import pyaudio
-    import wave
+class RecordWorker(QThread):
+    finished = pyqtSignal()
 
-    chunk = 1024  # Record in chunks of 1024 samples
-    sample_format = pyaudio.paInt16  # 16 bits per sample
-    channels = 1
+    def __init__(self, filename, record_seconds):
+        super().__init__()
+        self.filename = filename
+        self.record_seconds = record_seconds
 
-    p = pyaudio.PyAudio()  # Create an interface to PortAudio
-
-    print('Recording')
-
-    stream = p.open(format=sample_format,
-                    channels=channels,
-                    rate=fs,
-                    frames_per_buffer=chunk,
-                    input=True)
-
-    frames = []  # Initialize array to store frames
-
-    # Store data in chunks for record seconds
-    for i in range(0, int(fs / chunk * record_seconds)):
-        data = stream.read(chunk)
-        frames.append(data)
-
-    # Stop and close the stream
-    stream.stop_stream()
-    stream.close()
-    # Terminate the PortAudio interface
-    p.terminate()
-
-    print('Finished recording')
-
-    # Save the recorded data as a WAV file
-    wf = wave.open(filename, 'wb')
-    wf.setnchannels(channels)
-    wf.setsampwidth(p.get_sample_size(sample_format))
-    wf.setframerate(fs)
-    wf.writeframes(b''.join(frames))
-    wf.close()
+    def run(self):
+        print('开始录音')
+        record_with_pyaudio(self.filename, self.record_seconds)
+        print('结束录音')
+        self.finished.emit()
 
 
 class Authenticate(authentication.Ui_authentication, QDialog):
@@ -94,6 +71,52 @@ class Authenticate(authentication.Ui_authentication, QDialog):
 
     # the core code lies here
     def compare(self):
+        print('调用摄像头，按下s后开始录制视频和音频')
+        cap = cv2.VideoCapture(0)
+
+        mouth_len = 60
+        imgs = []
+        flag = False
+        start_record = False
+
+        while True:
+            # 读取一帧图像
+            ret, frame = cap.read()
+
+            cv2.imshow('frame', frame)
+
+            # 存储
+            if flag == True:
+                if start_record == False:
+                    start_record = True
+                    if not os.path.exists(os.path.join("records")):
+                        os.makedirs(os.path.join("records"))
+                    name = os.path.join("records//authenticate_audio.wav")
+                    record_thread = RecordWorker(name, 4)
+                    record_thread.start()
+
+                imgs.append(frame)
+                print(f"{len(imgs)}", end=' ')
+                if len(imgs) == mouth_len:
+                    print()
+                    print('开始判断')
+                    detect_mouth_movement(imgs)
+                    print('判断结束')
+                    break
+
+            key = cv2.waitKey(1)
+
+            # 按s键开始识别
+            if key & 0xFF == ord('s'):
+                if len(imgs) == 0 and flag == False:
+                    print('开始识别')
+                    flag = True
+
+        # 释放摄像头并关闭窗口
+        cap.release()
+        cv2.destroyAllWindows()
+
+        print('目前处于测试阶段，默认解锁成功')
         ans = True
         if ans:
             self.success.show()
