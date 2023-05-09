@@ -2,11 +2,19 @@ import os
 
 import cv2
 from PyQt5.QtCore import QObject, pyqtSignal, QThreadPool, QRunnable, QThread
-from PyQt5.QtWidgets import QDialog
+from PyQt5.QtWidgets import QDialog, QApplication
+from PyQt5.uic.properties import QtWidgets
 
 from gui import success, fail, authentication
+
 from lip_detect import detect_mouth_movement
+
+from speech_recognition.CNN_use import predict_4_digit_audio
+
 from record_audio import record_with_pyaudio
+
+from voice_recognition.infer_recognition import recognize
+
 
 class Success(success.Ui_success, QDialog):
     def __init__(self):
@@ -22,13 +30,35 @@ class Fail(fail.Ui_fail, QDialog):
         self.back_pushbutton.clicked.connect(self.close)
 
 
+class CheckResult:
+    def __init__(self):
+        self.voice_flag = False
+        self.speech_flag = False
+        self.lip_flag = False
+
+    def set_voice_flag(self, bool):
+        self.voice_flag = bool
+
+    def set_lip_flag(self, bool):
+        self.lip_flag = bool
+
+    def set_speech_flag(self, bool):
+        self.speech_flag = bool
+
+    def check_func(self):
+        return self.voice_flag and (self.speech_flag or self.lip_flag)
+
+
+check_result = CheckResult()
+
+
 def generate_4_digit_code():
     import random
     random_num = []
     i = 0
     while i < 4:
         num = random.randint(0, 9)
-        if num == 1:  # exclude 1
+        if num in random_num:
             continue
         else:
             random_num.append(num)
@@ -51,6 +81,51 @@ class RecordWorker(QThread):
         self.finished.emit()
 
 
+class VoiceRecognizer(QThread):
+    finished = pyqtSignal()
+
+    def __init__(self):
+        super().__init__()
+
+    def run(self):
+        print('开始识别声纹')
+        result = recognize()
+        check_result.set_voice_flag(result)
+        print('结束识别声纹')
+        self.finished.emit()
+
+
+def judge_chinese_num_accuracy(origin_arr, result_arr):
+    print('origin array:', origin_arr)
+    print('result array:', result_arr)
+
+    count = 0
+
+    for i in range(4):
+        if origin_arr[i] == result_arr[i]:
+            count += 1
+
+        if count / 4 >= 3 / 4:
+            return True
+
+    return False
+
+
+class SpeechRecognizer(QThread):
+    finished = pyqtSignal()
+
+    def __init__(self, origin_arr):
+        super().__init__()
+        self.origin_arr = origin_arr
+
+    def run(self):
+        print('开始识别语音')
+        result = predict_4_digit_audio()
+        check_result.set_speech_flag(judge_chinese_num_accuracy(self.origin_arr, result))
+        print('结束识别语音')
+        self.finished.emit()
+
+
 class Authenticate(authentication.Ui_authentication, QDialog):
     def __init__(self):
         super().__init__()
@@ -69,12 +144,22 @@ class Authenticate(authentication.Ui_authentication, QDialog):
         self.success = Success()
         self.fail = Fail()
 
+    def check_result_func(self):
+        if self.voice_recognizer.isRunning() or self.speech_recognizer.isRunning():
+            return
+        # 以下是检查结果的代码
+        ans = check_result.check_func()
+        if ans:
+            self.success.show()
+        else:
+            self.fail.show()
+
     # the core code lies here
     def compare(self):
         print('调用摄像头，按下s后开始录制视频和音频')
         cap = cv2.VideoCapture(0)
 
-        mouth_len = 60
+        mouth_len = 80
         imgs = []
         flag = False
         start_record = False
@@ -92,16 +177,35 @@ class Authenticate(authentication.Ui_authentication, QDialog):
                     if not os.path.exists(os.path.join("records")):
                         os.makedirs(os.path.join("records"))
                     name = os.path.join("records//authenticate_audio.wav")
-                    record_thread = RecordWorker(name, 4)
-                    record_thread.start()
+                    self.record_thread = RecordWorker(name, 5)
+                    self.record_thread.start()
+
+                    # 等待一段时间，让 record_thread 有足够的时间启动并运行
+                    QThread.msleep(100)
+
+                    self.voice_recognizer = VoiceRecognizer()
+                    self.speech_recognizer = SpeechRecognizer(self.digit_code)
+                    self.record_thread.finished.connect(self.voice_recognizer.start)
+                    self.record_thread.finished.connect(self.speech_recognizer.start)
+
+                    self.voice_recognizer.finished.connect(self.check_result_func)
+                    self.speech_recognizer.finished.connect(self.check_result_func)
+
+                    # 启动事件循环
+                    QApplication.processEvents()
 
                 imgs.append(frame)
                 print(f"{len(imgs)}", end=' ')
+
+                if len(imgs) % 10 == 0:
+                    print()
+
                 if len(imgs) == mouth_len:
                     print()
-                    print('开始判断')
-                    detect_mouth_movement(imgs)
-                    print('判断结束')
+                    print('开始判断嘴唇')
+                    result = detect_mouth_movement(imgs)
+                    check_result.set_lip_flag(result)
+                    print('嘴唇判断结束')
                     break
 
             key = cv2.waitKey(1)
@@ -116,9 +220,18 @@ class Authenticate(authentication.Ui_authentication, QDialog):
         cap.release()
         cv2.destroyAllWindows()
 
-        print('目前处于测试阶段，默认解锁成功')
-        ans = True
-        if ans:
-            self.success.show()
-        else:
-            self.fail.show()
+        # while not check_result.is_all_finished():
+        #     # print(len(check_result.result))
+        #     continue
+
+        # self.record_thread.wait()
+        # self.speech_recognizer.wait()
+        # self.voice_recognizer.wait()
+        #
+        # print(check_result.result)
+        # ans = check_result.check_func()
+        #
+        # if ans:
+        #     self.success.show()
+        # else:
+        #     self.fail.show()

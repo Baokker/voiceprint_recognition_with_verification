@@ -32,33 +32,43 @@ class Register(user_register.Ui_user_register, QDialog):
             msg = QtWidgets.QMessageBox.information(self, '提示', '文本栏为空！\n请先输入用户名')
             return
 
-        if not os.path.exists(os.path.join(os.curdir, "enroll")):
-            os.makedirs(os.path.join(os.curdir, "enroll"))
+        path = os.path.join(os.curdir, "enroll")
+        if not os.path.exists(path):
+            os.makedirs(path)
 
-        enroll_user_dir = os.path.join(os.curdir, "enroll", name)
-
-        if not os.path.exists(enroll_user_dir):
-            os.makedirs(enroll_user_dir)
-
-        file1_name = name + '_record1.wav'
-        file2_name = name + '_record2.wav'
-        file3_name = name + '_record3.wav'
-
-        if os.path.exists(os.path.join(enroll_user_dir, file3_name)):
+        if os.path.exists(os.path.join(path, name + '.wav')):
             msg = QtWidgets.QMessageBox.information(self, '提示', '此用户已经收集数据完毕！')
             return
-        elif os.path.exists(os.path.join(enroll_user_dir, file2_name)):
-            msg = QtWidgets.QMessageBox.information(self, '提示', '按下OK开始录音!\n0 1 2 3 4 5 6 7 8 9')
-            record_with_pyaudio(os.path.join(enroll_user_dir, file3_name))
-            msg = QtWidgets.QMessageBox.information(self, '提示', '录音完成！')
-        elif os.path.exists(os.path.join(enroll_user_dir, file1_name)):
-            msg = QtWidgets.QMessageBox.information(self, '提示', '按下OK开始录音!\n0 1 2 3 4 5 6 7 8 9')
-            record_with_pyaudio(os.path.join(enroll_user_dir, file2_name))
-            msg = QtWidgets.QMessageBox.information(self, '提示', '录音完成！')
         else:
             msg = QtWidgets.QMessageBox.information(self, '提示', '按下OK开始录音!\n0 1 2 3 4 5 6 7 8 9')
-            record_with_pyaudio(os.path.join(enroll_user_dir, file1_name))
+            record_with_pyaudio(os.path.join(path, name + '.wav'))
             msg = QtWidgets.QMessageBox.information(self, '提示', '录音完成！')
+
+
+        # enroll_user_dir = os.path.join(os.curdir, "enroll", name)
+
+        # if not os.path.exists(enroll_user_dir):
+        #     os.makedirs(enroll_user_dir)
+        #
+        # file1_name = name + '_record1.wav'
+        # file2_name = name + '_record2.wav'
+        # file3_name = name + '_record3.wav'
+
+        # if os.path.exists(os.path.join(enroll_user_dir, file3_name)):
+        #     msg = QtWidgets.QMessageBox.information(self, '提示', '此用户已经收集数据完毕！')
+        #     return
+        # elif os.path.exists(os.path.join(enroll_user_dir, file2_name)):
+        #     msg = QtWidgets.QMessageBox.information(self, '提示', '按下OK开始录音!\n0 1 2 3 4 5 6 7 8 9')
+        #     record_with_pyaudio(os.path.join(enroll_user_dir, file3_name))
+        #     msg = QtWidgets.QMessageBox.information(self, '提示', '录音完成！')
+        # elif os.path.exists(os.path.join(enroll_user_dir, file1_name)):
+        #     msg = QtWidgets.QMessageBox.information(self, '提示', '按下OK开始录音!\n0 1 2 3 4 5 6 7 8 9')
+        #     record_with_pyaudio(os.path.join(enroll_user_dir, file2_name))
+        #     msg = QtWidgets.QMessageBox.information(self, '提示', '录音完成！')
+        # else:
+        #     msg = QtWidgets.QMessageBox.information(self, '提示', '按下OK开始录音!\n0 1 2 3 4 5 6 7 8 9')
+        #     record_with_pyaudio(os.path.join(enroll_user_dir, file1_name))
+        #     msg = QtWidgets.QMessageBox.information(self, '提示', '录音完成！')
 
 
 class Delete(user_delete.Ui_user_register, QDialog):
@@ -79,10 +89,8 @@ class Delete(user_delete.Ui_user_register, QDialog):
         if not os.path.exists(os.path.join(os.curdir, "enroll")):
             os.makedirs(os.path.join(os.curdir, "enroll"))
 
-        for file in os.listdir(users_path):
-            d = os.path.join(users_path, file)
-            if os.path.isdir(d):
-                users.append(os.path.basename(d))
+        for file in os.listdir(os.path.join(os.curdir, "enroll")):
+            users.append(file[:-4])
 
         self.qList = users
 
@@ -95,7 +103,7 @@ class Delete(user_delete.Ui_user_register, QDialog):
                                    QMessageBox.Yes | QMessageBox.No)
 
         if ret == QMessageBox.Yes:
-            shutil.rmtree(os.path.join(os.curdir, "enroll", self.qList[qModelIndex.row()]))
+            os.remove(os.path.join(os.curdir, "enroll", self.qList[qModelIndex.row()] + '.wav'))
             self.update_user()
 
     def show(self):

@@ -1,4 +1,4 @@
-def record_with_pyaudio(filename, record_seconds=10, fs=44100):
+def record_with_pyaudio(filename, record_seconds=10, fs=16000):
     import pyaudio
     import wave
 

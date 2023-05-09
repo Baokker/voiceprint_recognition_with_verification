@@ -45,8 +45,7 @@ def detect_mouth_movement(imgs):
     total_count, moving_count = 0, 0
     print("检测嘴唇")
     for i in range(len(imgs)):
-        if not i % 4:
-
+        if not i % 6:
             gray = cv2.cvtColor(imgs[i], cv2.COLOR_BGR2GRAY)  # 处理一帧，转为灰度图
             # 坐标为[(x1, y1) (x2, y2)]
             rets = detector(gray, 1)
@@ -62,14 +61,14 @@ def detect_mouth_movement(imgs):
                 points_recorder_now = feature_standardization(mouse_points)
 
                 sim = euclidean_distance(points_recorder_last, points_recorder_now)
-                print(sim)
+                print('lip movement: ', sim)
                 total_count += 1
 
                 if sim > 0.15:
                     moving_count += 1
-                    print("lip moving...")
-                else:
-                    print("move too subtle..")
+                    # print("lip moving...")
+                # else:
+                #     print("move too subtle..")
 
                 points_recorder_last = points_recorder_now
 
