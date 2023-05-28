@@ -1,38 +1,29 @@
-To simply run the gui, you must
+# 安装环境
 
 ```bash
-pip install PyQt5
-pip install PyAudio
+conda create -f env_list/environment-new.yml
 ```
 
-with py38 first
+可能能跑起来
 
-then run
+# 运行
 
 ```bash
+conda activate lipreading
 python voiceprint_recognition.py
 ```
 
----
+可能可以运行
 
-更详细一些
+# 系统干了什么
 
-经测试，系统可以在Windows和Linux（如Ubuntu）下运行。
+详见`main/authenticate.py`
 
-- 首先确保系统中安装了anaconda
-
-- 切换到项目文件夹下，在命令行中运行
-
-  ```bash
-  conda env create -f env_list/conda_list.yml
-  ```
-
-  则会在系统中`$HOME/anaconda3/envs/voice`中安装所需环境
-  如需更改安装路径，可修改`conda_env.yml`中的`prefix`参数
-
-- 即可运行
-
-  ```bash
-  conda activate voice
-  python 'Voiceprint recognition.py'
-  ```
+- 按下s开始录制视频和音频
+- 录制5秒的音频
+- 录制80帧的嘴唇序列（中间有间隔）
+- 判断嘴唇是否移动
+- 将5秒的音频分割成四个数字的音频（很容易翻车）
+- 进行语音识别
+- 对5秒的音频进行声纹识别
+- 综合嘴唇、声纹、语音识别，得出结果

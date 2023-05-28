@@ -176,8 +176,11 @@ class Authenticate(authentication.Ui_authentication, QDialog):
                     start_record = True
                     if not os.path.exists(os.path.join("records")):
                         os.makedirs(os.path.join("records"))
+                        
                     name = os.path.join("records//authenticate_audio.wav")
-                    self.record_thread = RecordWorker(name, 5)
+
+                    record_time = 5
+                    self.record_thread = RecordWorker(name, record_time)
                     self.record_thread.start()
 
                     # 等待一段时间，让 record_thread 有足够的时间启动并运行
@@ -219,19 +222,3 @@ class Authenticate(authentication.Ui_authentication, QDialog):
         # 释放摄像头并关闭窗口
         cap.release()
         cv2.destroyAllWindows()
-
-        # while not check_result.is_all_finished():
-        #     # print(len(check_result.result))
-        #     continue
-
-        # self.record_thread.wait()
-        # self.speech_recognizer.wait()
-        # self.voice_recognizer.wait()
-        #
-        # print(check_result.result)
-        # ans = check_result.check_func()
-        #
-        # if ans:
-        #     self.success.show()
-        # else:
-        #     self.fail.show()
