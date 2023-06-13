@@ -101,7 +101,9 @@ def judge_chinese_num_accuracy(origin_arr, result_arr):
 
     count = 0
 
-    for i in range(4):
+    min_len = min(len(origin_arr), len(result_arr))
+
+    for i in range(min_len):
         if origin_arr[i] == result_arr[i]:
             count += 1
 
@@ -159,7 +161,7 @@ class Authenticate(authentication.Ui_authentication, QDialog):
         print('调用摄像头，按下s后开始录制视频和音频')
         cap = cv2.VideoCapture(0)
 
-        mouth_len = 80
+        mouth_len = 60
         imgs = []
         flag = False
         start_record = False

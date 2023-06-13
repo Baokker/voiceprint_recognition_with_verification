@@ -1,9 +1,14 @@
 from pydub import AudioSegment
 from pydub.silence import split_on_silence
-
+import os
 
 def split_audio():
     sound = AudioSegment.from_mp3("./records/authenticate_audio.wav")
+    # delete old audio
+    for i in range(10):
+        if os.path.exists("./records/authenticate_audio_" + str(i) + ".wav"):
+            os.remove("./records/authenticate_audio_" + str(i) + ".wav")
+
     loudness = sound.dBFS
 
     chunks = split_on_silence(sound,

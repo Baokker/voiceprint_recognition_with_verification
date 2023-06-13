@@ -6,7 +6,7 @@ Created on Mon Oct 17 14:21:11 2022
 """
 
 from speech_recognition.split_audio import split_audio
-
+import os
 
 def predict_4_digit_audio():
     from CNN_model import load_model, predict
@@ -17,8 +17,9 @@ def predict_4_digit_audio():
 
     result = []
 
-    for i in range(4):
+    for i in range(10):
         file = "./records/authenticate_audio_" + str(i) + ".wav"
-        result.extend(predict(cnn, file))
+        if os.path.exists(file):
+            result.extend(predict(cnn, file))
 
     return result
